@@ -13,7 +13,7 @@ interface PackageConfig {
 }
 
 interface ProjectConfig {
-    wit_paths?: string[];
+    witPaths?: string[];
     worlds?: string[];
 }
 
@@ -27,7 +27,7 @@ interface KnitWitConfig {
 ### Fields of `knitwit.json`
 
 - `version` - It is the version which describes the format of the config file
-- `project` - This contains the project specific `wit_paths` and `worlds`
+- `project` - This contains the project specific `witPaths` and `worlds`
 - `packages` - This field contains information about the different npm packages installed. 
 
 Here's an example of what a `knitwit.json` file might look like:
