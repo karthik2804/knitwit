@@ -31,6 +31,8 @@ async function appendEntryIfNotExists(filePath, packageName, packagePath, packag
     }
 
     data.packages[packageName] = { witPath: packagePath, world: packageWorld };
+    // Validate data before writing to file
+    await knitWitConfigSchema.validate(data);
     fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
 }
 
