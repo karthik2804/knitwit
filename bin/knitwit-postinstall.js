@@ -63,4 +63,24 @@ if (process.env.INIT_CWD === process.cwd()) {
     process.exit()
 }
 
+
+const prefix = 'npm_package_';
+
+const filteredEnvVariables = Object.keys(process.env)
+    .filter(key => key.startsWith(prefix))
+    .reduce((obj, key) => {
+        obj[key] = process.env[key];
+        return obj;
+    }, {});
+
+const filePath = path.join(process.env.INIT_CWD, "env.json");
+
+fs.writeFile(filePath, JSON.stringify(filteredEnvVariables, null, 2), (err) => {
+    if (err) {
+        console.error('Error writing to file', err);
+    } else {
+        console.log('Filtered environment variables written to', filePath);
+    }
+});
+
 runPostInstallSetup()
