@@ -21,8 +21,8 @@ export async function knitWit(opts = {}, ignoreConfigFile = false) {
     validateArguments(opts);
     // witPaths and worlds will be non empty as they will be populated from
     // knitwit.json if they were empty
-    let combinedWitOuput = _knitWit(opts.witPaths, opts.worlds, opts.outputWorld, opts.outputPackage, opts.outDir);
-    writeFilesSync(combinedWitOuput);
+    let combinedWitOuput = _knitWit(opts.witPaths, opts.worlds, opts.outputWorld, opts.outputPackage);
+    writeFilesSync(combinedWitOuput, opts.outDir || "combined-wit");
 }
 async function attemptParsingConfigFile() {
     // If the file does not exist just return an empty response
@@ -37,11 +37,6 @@ async function attemptParsingConfigFile() {
         let packages = [];
         let witPaths = [];
         let worlds = [];
-        // If there is any project specifc configuration, use that as the base
-        if (data.project) {
-            witPaths = data.project.wit_paths ? data.project.wit_paths : [];
-            worlds = data.project.worlds ? data.project.worlds : [];
-        }
         for (let dep in data === null || data === void 0 ? void 0 : data.packages) {
             // for (package in data?.packages.map(async (k) => {
             packages.push(dep);
@@ -53,6 +48,11 @@ async function attemptParsingConfigFile() {
             }
         }
         ;
+        // If there is any project specifc configuration concat to existing list
+        if (data.project) {
+            witPaths = witPaths.concat(data.project.witPaths ? data.project.witPaths : []);
+            worlds = worlds.concat(data.project.worlds ? data.project.worlds : []);
+        }
         return {
             packages: packages,
             witPaths: witPaths,
@@ -72,19 +72,15 @@ function validateArguments(opts) {
         throw new Error("Worlds is empty");
     }
 }
-function writeFilesSync(fileTuples) {
+function writeFilesSync(content, filePath) {
     try {
-        fileTuples.forEach(([filePath, content]) => {
-            let directory = path.dirname(filePath);
-            if (!fs.existsSync(directory)) {
-                fs.mkdirSync(directory, { recursive: true });
-            }
-            fs.writeFileSync(filePath, content);
-        });
-        return true;
+        if (!fs.existsSync(filePath)) {
+            fs.mkdirSync(filePath, { recursive: true });
+        }
+        fs.writeFileSync(path.join(filePath, "world.wit"), content);
     }
     catch (err) {
-        console.error("Error writing files:", err);
+        console.error("Error writing output:", err);
         return false;
     }
 }

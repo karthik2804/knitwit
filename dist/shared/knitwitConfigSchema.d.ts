@@ -4,7 +4,7 @@ interface PackageConfig {
     world: string;
 }
 interface ProjectConfig {
-    wit_paths?: string[];
+    witPaths?: string[];
     worlds?: string[];
 }
 interface KnitWitConfig {
